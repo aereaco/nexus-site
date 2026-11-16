@@ -1,0 +1,33 @@
+<!-- Inline Header Bar with Breadcrumbs & Page Tabs Toggle (when floatingBookmarks is false) -->
+<div data-show="!floatingBookmarks"
+  class="flex items-center gap-2 max-w-full shrink-0 min-h-[2.5rem] overflow-x-auto overflow-y-hidden scrollbar-none px-6 pt-3 pb-1"
+  data-on-wheel_passive="if ($evt.deltaY) { $evt.currentTarget.scrollLeft += $evt.deltaY; }">
+  <!-- 1. Page Tab Toggle Button at the START position -->
+  <div class="tooltip tooltip-bottom shrink-0" data-tip="Toggle page tabs">
+    <button class="btn btn-sm btn-ghost btn-circle"
+      data-class="{ 'btn-active text-primary bg-primary/10': pageTabs }"
+      data-on-mouseenter_debounce.2000ms="pageTabToggleHovered = true"
+      data-on-mouseleave_debounce.cancel="pageTabToggleHovered = false"
+      data-on-click="pageTabs = !pageTabs; localStorage.setItem('pageTabs', pageTabs)"
+      aria-label="Toggle page tabs">
+      <iconify-icon icon="material-symbols-light:tab-group-outline" class="text-xl"></iconify-icon>
+    </button>
+  </div>
+
+  <div class="divider divider-horizontal mx-0 my-0 h-5 opacity-40 shrink-0"></div>
+
+  <!-- 2. Pure Horizontal Breadcrumbs with Icons and Lineage (zero wrap, zero vertical scroll) -->
+  <div class="breadcrumbs text-sm font-medium p-0 overflow-visible shrink-0 min-w-max">
+    <ul class="flex flex-nowrap items-center whitespace-nowrap gap-1 min-w-max my-0 py-0">
+      <template data-for="crumb in router.lineage">
+        <li class="flex items-center gap-1 shrink-0">
+          <a data-bind-href="crumb.href"
+            class="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
+            <iconify-icon data-show="crumb.icon" data-bind-icon="crumb.icon" class="text-lg"></iconify-icon>
+            <span data-bind="crumb.title"></span>
+          </a>
+        </li>
+      </template>
+    </ul>
+  </div>
+</div>

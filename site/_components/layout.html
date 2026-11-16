@@ -1,0 +1,106 @@
+<div class="grid grid-cols-[0rem_1fr] transition-[grid-template-columns] duration-300"
+  data-on-keydown_window="if (($evt.ctrlKey || $evt.metaKey) && ($evt.key === 'k' || $evt.key === 'K')) { $evt.preventDefault(); favModalOpen = false; favDeleteModalOpen = false; searchQuery = ''; searchDebouncedQuery = ''; searchTokens = []; searchResults = []; flatResults = []; searchActiveIndex = 0; searchOpen = true; } else if ($evt.ctrlKey && ($evt.key === '`' || $evt.key === '~')) { $evt.preventDefault(); if (typeof toggleTerminalHud === 'function') toggleTerminalHud(); }"
+  data-signal_global="{
+    collapsed: localStorage.collapsed !== 'false',
+    pageTabs: localStorage.pageTabs !== 'false',
+    fixedHeader: localStorage.fixedHeader !== 'false',
+    fixedFooter: localStorage.fixedFooter !== 'false',
+    floatingBookmarks: localStorage.floatingBookmarks !== 'false',
+    lastThemeMode: '',
+    sidebarDarkness: Number(localStorage.sidebarDarkness_dark ?? localStorage.sidebarDarkness ?? 30),
+    sidebarOpacity: Number(localStorage.sidebarOpacity_dark ?? localStorage.sidebarOpacity ?? 90),
+    sidebarTextLightness: Number(localStorage.sidebarTextLightness_dark ?? localStorage.sidebarTextLightness ?? 100),
+    hovered: false,
+    sidebarHovered: false,
+    sidebarOpen: false,
+    isMobile: window.matchMedia('(max-width: 767px)').matches,
+    recent: [],
+    activeSidebarTab: 1,
+    ctxMenu: { open: false, x: 0, y: 0, type: null, target: null, source: null },
+    toasts: [],
+    notify: (titleOrMsg, message = '', type = 'success', priority = 'normal', dur = 7000) => {
+      const g = window.UX?.signals || window.Nexus?.coordinator?.runtimeContext?.globalSignals?.() || {};
+      const actualTitle = message ? titleOrMsg : (type.charAt(0).toUpperCase() + type.slice(1));
+      const actualMsg = message || titleOrMsg;
+      const id = 'notif-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+      if (Array.isArray(g.notifications)) {
+        g.notifications = [{ id, title: actualTitle, message: actualMsg, type, priority, time: 'Just now', read: false }, ...g.notifications];
+      }
+      g.toasts = [...(g.toasts || []), { id, title: actualTitle, message: actualMsg, type, duration: dur }];
+      window.setTimeout(() => {
+        g.toasts = (g.toasts || []).filter(t => t.id !== id);
+      }, dur);
+    },
+    themes: ['light','dark','cupcake','bumblebee','emerald','corporate','synthwave','retro','cyberpunk','valentine','halloween','garden','forest','aqua','lofi','pastel','fantasy','wireframe','black','luxury','dracula','cmyk','autumn','business','acid','lemonade','night','coffee','winter','dim','nord','sunset']
+  }"
+  data-class="{ 'md:grid-cols-[max-content_1fr]': !collapsed, 'md:grid-cols-[4rem_1fr]': collapsed, 'h-screen max-h-screen overflow-hidden': fixedHeader, 'min-h-screen': !fixedHeader }"
+  data-on-resize_window="isMobile = window.matchMedia('(max-width: 767px)').matches">
+  <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+  <div
+    class="drawer-content flex flex-col transition-[padding] duration-300 ease-in-out h-screen max-h-screen overflow-hidden"
+    data-class="{ 'h-full overflow-hidden': fixedHeader, 'min-h-screen': !fixedHeader, 'md:pe-96': chatbarDocked && chatbarOpen, 'pe-0': !chatbarDocked || !chatbarOpen }">
+
+    <!-- Top Navbar Header -->
+    <layout-header data-component="'_components/layout-header.html'"></layout-header>
+
+    <!-- Workspace Tab Bar -->
+    <layout-tabs data-component="'_components/layout-tabs.html'"></layout-tabs>
+
+    <!-- Content Panel & Footer Wrapper -->
+    <div class="flex-1 flex flex-col min-h-0 w-full grow relative overflow-hidden">
+
+      <!-- Floating Side Hover Expanding Tab | Breadcrumbs & Page Tabs Toggle -->
+      <layout-floating-bookmarks data-component="'_components/layout-floating-bookmarks.html'"></layout-floating-bookmarks>
+
+      <!-- Main Content & Scrollbar Location Ticks Container -->
+      <div class="relative grow flex-1 flex flex-col min-h-0 overflow-hidden">
+        <!-- Inline Header Bar with Breadcrumbs & Page Tabs Toggle -->
+        <layout-breadcrumbs data-component="'_components/layout-breadcrumbs.html'"></layout-breadcrumbs>
+
+        <!-- Tab Outlets Container: flex container holding independent tabpanel scroll outlets -->
+        <div class="grow flex-1 flex flex-col min-h-0 relative overflow-hidden">
+          <template data-for="tab in router.pageTabs">
+            <div role="tabpanel"
+              class="w-full grow flex-1 flex flex-col min-h-0 relative overflow-y-auto overflow-x-hidden p-6"
+              data-show="router.activePageTabId === tab.id"
+              data-effect="if (router.activePageTabId === tab.id) { $el.__scrollbarInstance?.show(); } else { $el.__scrollbarInstance?.hide(); } if (tab._renderedRoute !== (tab.route || tab.source)) { tab._renderedRoute = (tab.route || tab.source); $el.scrollTop = 0; } if (router.activePageTabId === tab.id && searchTabs && searchTabs[tab.id] && !searchTabs[tab.id].scrolled && searchTabs[tab.id].ticks && searchTabs[tab.id].ticks.length !== 0) { const firstTick = searchTabs[tab.id].ticks[0]; $el.scrollTo({ top: Math.max(0, (firstTick / 100) * $el.scrollHeight - 80), behavior: 'smooth' }); searchTabs[tab.id].scrolled = true; } if (router.activePageTabId === tab.id && searchTargetTick !== null) { $el.scrollTo({ top: Math.max(0, (searchTargetTick / 100) * $el.scrollHeight - ($el.clientHeight / 2)), behavior: 'smooth' }); searchTargetTick = null; }">
+              <!-- Default Loading Fallback Skeleton -->
+              <div data-show="tab.isLoading !== false" class="flex flex-col gap-4 w-full p-4 animate-pulse">
+                <div class="skeleton h-8 w-1/3 rounded-lg bg-base-300"></div>
+                <div class="skeleton h-4 w-full rounded bg-base-300"></div>
+                <div class="skeleton h-4 w-5/6 rounded bg-base-300"></div>
+                <div class="skeleton h-64 w-full rounded-xl bg-base-300"></div>
+              </div>
+
+              <!-- Fully Loaded Route Content -->
+              <tab-content data-component="tab.source || tab.content" data-show="tab.isLoading === false"
+                class="grow flex-1 flex flex-col min-h-0 [&>body]:flex [&>body]:flex-col [&>body]:flex-1 [&>body]:min-h-0 [&>body]:h-full [&>body]:m-0 [&>body]:bg-transparent"
+                data-effect="if (router.activePageTabId === tab.id && !tab.isLoading) { const entry = searchTabs && searchTabs[tab.id]; if (entry && entry.tokens && entry.tokens.length !== 0) { if (typeof syncPageHighlights === 'function') { syncPageHighlights($el, tab.id, entry.tokens); } } else if (typeof CSS !== 'undefined' && CSS.highlights) { CSS.highlights.delete('page-match'); searchHighlightCount = 0; searchTicks = []; } }"></tab-content>
+            </div>
+          </template>
+
+          <!-- Floating In-Page Search Matches Badge & Scrollbar Location Ticks -->
+          <layout-search-highlights data-component="'_components/layout-search-highlights.html'"></layout-search-highlights>
+        </div>
+      </div>
+
+      <!-- Page Footer with Inline Diagnostics -->
+      <layout-footer data-component="'_components/layout-footer.html'"></layout-footer>
+    </div>
+
+    <!-- Search Modal -->
+    <layout-search-modal data-component="'_components/layout-search-modal.html'"></layout-search-modal>
+  </div>
+
+  <!-- Left Sidebar Drawer -->
+  <layout-sidebar data-component="'_components/layout-sidebar.html?v=3'"></layout-sidebar>
+
+  <!-- Declaratively Teleported Context Menu -->
+  <layout-context-menu data-component="'_components/layout-context-menu.html'"></layout-context-menu>
+
+  <!-- Favorites Modals -->
+  <layout-favorites-modal data-component="'_components/layout-favorites-modal.html'"></layout-favorites-modal>
+
+  <!-- App-Wide Declarative Toaster Notifications -->
+  <layout-toasts data-component="'_components/layout-toasts.html'"></layout-toasts>
+</div>

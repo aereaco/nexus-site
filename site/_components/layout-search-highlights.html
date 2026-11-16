@@ -1,0 +1,30 @@
+<!-- Floating In-Page Search Matches Badge & Scrollbar Location Ticks -->
+<div>
+  <div data-show="searchTabs && searchTabs[router.activePageTabId] && searchTabs[router.activePageTabId].count > 0 && !searchOpen"
+    class="absolute top-3 start-8 z-40 flex items-center gap-2.5 bg-base-100/90 backdrop-blur-md px-3.5 py-2 rounded-full border border-accent/30 shadow-2xl text-xs font-mono transition-all duration-300 animate-fade-in"
+    data-on-keydown_escape_window="if (searchTabs) { delete searchTabs[router.activePageTabId]; searchTabs = { ...searchTabs }; }">
+    <span class="relative flex h-2 w-2">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+    </span>
+    <span class="text-base-content/80 font-sans">
+      <strong class="text-accent font-bold font-mono" data-bind="searchTabs[router.activePageTabId]?.count || 0"></strong> match(es) for &ldquo;<span class="font-semibold text-accent" data-bind="searchTabs[router.activePageTabId]?.query || ''"></span>&rdquo;
+    </span>
+    <button type="button" class="btn btn-ghost btn-xs btn-circle ms-1 opacity-70 hover:opacity-100 hover:bg-accent/10 hover:text-accent"
+      aria-label="Clear highlights" title="Clear highlights (Esc)"
+      data-on-click_stop="if (searchTabs) { delete searchTabs[router.activePageTabId]; searchTabs = { ...searchTabs }; }">
+      <iconify-icon icon="material-symbols-light:close" class="pointer-events-none text-sm"></iconify-icon>
+    </button>
+  </div>
+
+  <!-- Declarative Scrollbar Location Ticks Track (accent color) along the vertical scrollbar -->
+  <div data-show="searchTabs && searchTabs[router.activePageTabId] && searchTabs[router.activePageTabId].ticks && searchTabs[router.activePageTabId].ticks.length !== 0"
+    class="pointer-events-none absolute top-0 end-0 bottom-0 w-2.5 z-30 overflow-hidden">
+    <template data-for="tick in (searchTabs && searchTabs[router.activePageTabId] ? searchTabs[router.activePageTabId].ticks : [])">
+      <div class="absolute inset-x-0 h-1 rounded-full bg-accent pointer-events-auto cursor-pointer shadow-xs hover:scale-x-125 transition-transform"
+        data-style="{ top: tick + '%' }"
+        data-on-click="searchTargetTick = tick">
+      </div>
+    </template>
+  </div>
+</div>
